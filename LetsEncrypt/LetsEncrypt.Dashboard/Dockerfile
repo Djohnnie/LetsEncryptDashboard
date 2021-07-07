@@ -6,7 +6,7 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
 COPY ["LetsEncrypt.Dashboard.csproj", "LetsEncrypt.Dashboard/"]
 WORKDIR "/src/LetsEncrypt.Dashboard"
-RUN dotnet restore "LetsEncrypt.Dashboard/LetsEncrypt.Dashboard.csproj"
+RUN dotnet restore "LetsEncrypt.Dashboard.csproj"
 COPY . .
 RUN dotnet build "LetsEncrypt.Dashboard.csproj" -c Release -o /app/build
 
