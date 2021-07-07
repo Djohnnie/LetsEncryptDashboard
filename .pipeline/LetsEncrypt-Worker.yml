@@ -31,7 +31,7 @@ steps:
       **/LetsEncrypt.Worker.csproj
 
 - script: |
-    cd ./LetsEncrypt/LetsEncrypt.Worker
+    cd ./LetsEncrypt
     docker build -t djohnnie/letsencrypt-worker .
     docker login -u $(dockerId) -p $(dockerPwd)
     docker push djohnnie/letsencrypt-worker
