@@ -31,7 +31,7 @@ steps:
       **/LetsEncrypt.Dashboard.csproj
 
 - script: |
-    cd ./LetsEncrypt.Dashboard
+    cd ./LetsEncrypt/LetsEncrypt.Dashboard
     docker build -t djohnnie/letsencrypt-dashboard .
     docker login -u $(dockerId) -p $(dockerPwd)
     docker push djohnnie/letsencrypt-dashboard
