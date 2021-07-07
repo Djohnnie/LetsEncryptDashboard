@@ -30,18 +30,8 @@ steps:
     projects: | 
       **/LetsEncrypt.Worker.csproj
 
-- task: DotNetCoreCLI@2
-  displayName: Publish Solution
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: | 
-      **/LetsEncrypt.Worker.csproj
-    arguments: '-o $(Build.ArtifactStagingDirectory)/Output'
-    modifyOutputPath: true
-
 - script: |
-    cd $(Build.ArtifactStagingDirectory)/Output
+    cd ./LetsEncrypt.Worker
     docker build -t djohnnie/letsencrypt-worker .
     docker login -u $(dockerId) -p $(dockerPwd)
     docker push djohnnie/letsencrypt-worker

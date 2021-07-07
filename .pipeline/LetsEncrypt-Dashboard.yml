@@ -30,18 +30,8 @@ steps:
     projects: | 
       **/LetsEncrypt.Dashboard.csproj
 
-- task: DotNetCoreCLI@2
-  displayName: Publish Solution
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: | 
-      **/LetsEncrypt.Dashboard.csproj
-    arguments: '-o $(Build.ArtifactStagingDirectory)/Output'
-    modifyOutputPath: true
-
 - script: |
-    cd $(Build.ArtifactStagingDirectory)/Output
+    cd ./LetsEncrypt.Dashboard
     docker build -t djohnnie/letsencrypt-dashboard .
     docker login -u $(dockerId) -p $(dockerPwd)
     docker push djohnnie/letsencrypt-dashboard
