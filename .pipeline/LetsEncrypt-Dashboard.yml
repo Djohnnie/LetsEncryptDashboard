@@ -24,7 +24,7 @@ steps:
       **/LetsEncrypt.Dashboard.csproj
 
 - task: DotNetCoreCLI@2
-  displayName: Build Solution
+  displayName: Build LetsEncrypt.Dashboard.csproj
   inputs:
     command: 'build'
     projects: | 
@@ -35,3 +35,4 @@ steps:
     docker build -t djohnnie/letsencrypt-dashboard .
     docker login -u $(dockerId) -p $(dockerPwd)
     docker push djohnnie/letsencrypt-dashboard
+  displayName: Build & Push djohnnie/letsencrypt-dashboard

@@ -24,7 +24,7 @@ steps:
       **/LetsEncrypt.Worker.csproj
 
 - task: DotNetCoreCLI@2
-  displayName: Build Solution
+  displayName: Build LetsEncrypt.Worker.csproj
   inputs:
     command: 'build'
     projects: | 
@@ -35,3 +35,4 @@ steps:
     docker build -t djohnnie/letsencrypt-worker .
     docker login -u $(dockerId) -p $(dockerPwd)
     docker push djohnnie/letsencrypt-worker
+  displayName: Build & Push djohnnie/letsencrypt-worker
