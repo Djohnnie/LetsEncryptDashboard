@@ -32,7 +32,7 @@ steps:
 
 - script: |
     cd ./LetsEncrypt
-    docker build -t djohnnie/letsencrypt-worker .
+    docker build -t djohnnie/letsencrypt-worker ./LetsEncrypt.Worker
     docker login -u $(dockerId) -p $(dockerPwd)
     docker push djohnnie/letsencrypt-worker
   displayName: Build & Push djohnnie/letsencrypt-worker
