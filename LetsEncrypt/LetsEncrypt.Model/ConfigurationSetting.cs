@@ -1,5 +1,4 @@
-﻿using System;
-using LetsEncrypt.Model.Base;
+﻿using LetsEncrypt.Model.Base;
 
 namespace LetsEncrypt.Model
 {

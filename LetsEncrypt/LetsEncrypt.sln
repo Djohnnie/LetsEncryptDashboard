@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LetsEncrypt.DataAccess", "L
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LetsEncrypt.Worker", "LetsEncrypt.Worker\LetsEncrypt.Worker.csproj", "{AFD23798-EB63-4BDB-96FB-5724B495006E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LetsEncrypt.Model", "LetsEncrypt.Model\LetsEncrypt.Model.csproj", "{05E98489-77B1-4817-A2B7-12F59D940C56}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LetsEncrypt.Model", "LetsEncrypt.Model\LetsEncrypt.Model.csproj", "{05E98489-77B1-4817-A2B7-12F59D940C56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

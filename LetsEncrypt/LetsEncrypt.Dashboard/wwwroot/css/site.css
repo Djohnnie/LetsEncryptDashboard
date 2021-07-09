@@ -30,6 +30,35 @@ a, .btn-link {
     color: red;
 }
 
+.bd-callout {
+    padding: 1.25rem;
+    margin-top: 0;
+    margin-bottom: 0;
+    border: 1px solid #eee;
+    border-left-width: .25rem;
+    border-radius: .25rem;
+}
+
+.bd-callout-success {
+    border-left-color: #c3e6cb;
+}
+
+.bd-callout-primary {
+    border-left-color: #b8daff;
+}
+
+.list-group-flush a {
+    border: none;
+    margin: 1px;
+    padding: 1px;
+}
+
+.list-group-flush {
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+    padding: 1px;
+}
+
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;
@@ -42,9 +71,9 @@ a, .btn-link {
     z-index: 1000;
 }
 
-    #blazor-error-ui .dismiss {
-        cursor: pointer;
-        position: absolute;
-        right: 0.75rem;
-        top: 0.5rem;
-    }
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}

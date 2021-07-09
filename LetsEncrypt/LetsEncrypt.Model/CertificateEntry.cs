@@ -1,4 +1,5 @@
-﻿using LetsEncrypt.Model.Base;
+﻿using System;
+using LetsEncrypt.Model.Base;
 
 namespace LetsEncrypt.Model
 {
@@ -10,5 +11,8 @@ namespace LetsEncrypt.Model
         public string Organization { get; set; }
         public string OrganizationUnit { get; set; }
         public string DomainName { get; set; }
+        public bool IsStaging { get; set; }
+        public DateTime? RenewedOn { get; set; }
+        public DateTime? ExpiresOn { get; set; }
     }
 }

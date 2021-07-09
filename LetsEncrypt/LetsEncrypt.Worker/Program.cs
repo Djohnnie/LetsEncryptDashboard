@@ -1,5 +1,5 @@
-using LetsEncrypt.Worker.Workers;
-using Microsoft.Extensions.DependencyInjection;
+using LetsEncrypt.Worker.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 namespace LetsEncrypt.Worker
@@ -13,9 +13,13 @@ namespace LetsEncrypt.Worker
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureServices((hostContext, services) =>
+                .ConfigureAppConfiguration(configBuilder =>
                 {
-                    services.AddHostedService<CertificateOrderWorker>();
+                    configBuilder.AddEnvironmentVariables();
+                })
+                .ConfigureServices(serviceCollection =>
+                {
+                    serviceCollection.AddWorker();
                 });
     }
 }

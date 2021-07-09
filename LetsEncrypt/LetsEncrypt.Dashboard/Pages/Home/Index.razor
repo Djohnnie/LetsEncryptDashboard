@@ -1,0 +1,37 @@
+﻿@page "/"
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<div class="list-group list-group-flush">
+
+    <a href="certificates/overview" class="list-group-item list-group-item-action flex-column align-items-start">
+        
+        <div class="bd-callout bd-callout-success">
+            
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">Certificates</h5>
+                <small class="text-muted">3 days ago</small>
+            </div>
+            
+            <br />
+            <CertificateEntries />
+        </div>
+    </a>
+
+    <a href="logging/overview" class="list-group-item list-group-item-action flex-column align-items-start">
+
+        <div class="bd-callout bd-callout-primary">
+
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">Logging</h5>
+                <small class="text-muted">23 days ago</small>
+            </div>
+
+            <br />
+            <LoggingEntries />
+        </div>
+    </a>
+
+</div>

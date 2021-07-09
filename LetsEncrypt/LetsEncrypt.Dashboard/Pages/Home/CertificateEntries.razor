@@ -1,0 +1,32 @@
+﻿@using LetsEncrypt.Managers.Interfaces
+@using LetsEncrypt.Model
+
+@inject ICertificateEntryManager _certificateEntryManager
+
+@if (_certificateEntries == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-sm">
+        @foreach (var certificateEntry in _certificateEntries)
+        {
+            <tr>
+                <td>@certificateEntry.DomainName</td>
+                <td>@($"Renewed {Math.Round((DateTime.UtcNow - certificateEntry.RenewedOn).Value.TotalDays)} days ago")</td>
+                <td>@($"Expires in {Math.Round((certificateEntry.ExpiresOn - DateTime.UtcNow).Value.TotalDays)} days")</td>
+            </tr>
+        }
+    </table>
+}
+
+@code
+{
+    private IList<CertificateEntry> _certificateEntries;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _certificateEntries = await _certificateEntryManager.GetCertificateEntries();
+    }
+}
