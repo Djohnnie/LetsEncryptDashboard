@@ -1,25 +1,33 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
+using LetsEncrypt.Dashboard.Workers;
+using LetsEncrypt.Managers.DependencyInjection;
+using Microsoft.AspNetCore.Hosting.StaticWebAssets;
+using MudBlazor.Services;
 
-namespace LetsEncrypt.Dashboard
+var builder = WebApplication.CreateBuilder(args);
+
+StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
+
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
+builder.Services.AddMudServices();
+builder.Services.AddHostedService<CertificateOrderWorker>();
+builder.Services.AddManagers();
+
+var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration(configBuilder =>
-                {
-                    configBuilder.AddEnvironmentVariables();
-                })
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
 }
+
+app.UseHttpsRedirection();
+
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.MapBlazorHub();
+app.MapFallbackToPage("/_Host");
+
+app.Run();

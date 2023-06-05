@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace LetsEncrypt.Managers.Interfaces
+namespace LetsEncrypt.Managers.Interfaces;
+
+public interface IConfigurationManager
 {
-    public interface IConfigurationManager
-    {
-        Task<int> GetWorkerDelay();
-    }
+    Task<int> GetWorkerDelay();
 }

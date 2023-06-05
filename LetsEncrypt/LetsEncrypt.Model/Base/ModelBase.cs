@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace LetsEncrypt.Model.Base
+namespace LetsEncrypt.Model.Base;
+
+public class ModelBase
 {
-    public class ModelBase
-    {
-        public Guid Id { get; set; }
-        public int SysId { get; set; }
-    }
+    public Guid Id { get; set; }
+    public int SysId { get; set; }
 }

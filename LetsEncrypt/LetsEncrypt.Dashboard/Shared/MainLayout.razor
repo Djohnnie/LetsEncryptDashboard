@@ -1,17 +1,13 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavigationMenu />
-    </div>
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
-    <div class="main">
-        <div class="top-row px-4">
-            <a href="https://github.com/Djohnnie/LetsEncryptDashboard" target="_blank">LetsEncrypt Dashboard GitHub repository</a>
-        </div>
-
-        <div class="content px-4">
-            @Body
-        </div>
-    </div>
-</div>
+<MudLayout>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
+            <LetsEncrypt.Dashboard.Pages.FetchData />
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>

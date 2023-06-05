@@ -1,9 +1,8 @@
-﻿namespace LetsEncrypt.Model.Enums
+﻿namespace LetsEncrypt.Model.Enums;
+
+public enum LoggingLevel
 {
-    public enum LoggingLevel
-    {
-        Debug,
-        Info,
-        Error
-    }
+    Debug,
+    Info,
+    Error
 }

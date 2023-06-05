@@ -2,10 +2,9 @@
 using System.Threading.Tasks;
 using LetsEncrypt.Model;
 
-namespace LetsEncrypt.Managers.Interfaces
+namespace LetsEncrypt.Managers.Interfaces;
+
+public interface ICertificateEntryManager
 {
-    public interface ICertificateEntryManager
-    {
-        Task<IList<CertificateEntry>> GetCertificateEntries();
-    }
+    Task<IList<CertificateEntry>> GetCertificateEntries();
 }

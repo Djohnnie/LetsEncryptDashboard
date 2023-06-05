@@ -7,22 +7,21 @@ using LetsEncrypt.Managers.Interfaces;
 using LetsEncrypt.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace LetsEncrypt.Managers
+namespace LetsEncrypt.Managers;
+
+public class CertificateEntryManager : ICertificateEntryManager
 {
-    public class CertificateEntryManager : ICertificateEntryManager
+    private readonly ILetsEncryptDbContext _dbContext;
+
+    public CertificateEntryManager(ILetsEncryptDbContext dbContext)
     {
-        private readonly ILetsEncryptDbContext _dbContext;
+        _dbContext = dbContext;
+    }
 
-        public CertificateEntryManager(ILetsEncryptDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
-
-        public async Task<IList<CertificateEntry>> GetCertificateEntries()
-        {
-            var certificateEntries = await _dbContext.CertificateEntries
-                .OrderBy(x => x.ExpiresOn).ToListAsync();
-            return certificateEntries;
-        }
+    public async Task<IList<CertificateEntry>> GetCertificateEntries()
+    {
+        var certificateEntries = await _dbContext.CertificateEntries
+            .OrderBy(x => x.ExpiresOn).ToListAsync();
+        return certificateEntries;
     }
 }

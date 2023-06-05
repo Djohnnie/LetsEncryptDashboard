@@ -1,10 +1,9 @@
 ﻿using LetsEncrypt.Model.Base;
 
-namespace LetsEncrypt.Model
+namespace LetsEncrypt.Model;
+
+public class ConfigurationSetting : ModelBase
 {
-    public class ConfigurationSetting : ModelBase
-    {
-        public string Name { get; set; }
-        public string Value { get; set; }
-    }
+    public string Name { get; set; }
+    public string Value { get; set; }
 }
