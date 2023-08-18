@@ -1,10 +1,14 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
+#nullable disable
+
 namespace LetsEncrypt.DataAccess.Migrations;
 
+/// <inheritdoc />
 public partial class Initial_Migration : Migration
 {
+    /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.CreateTable(
@@ -12,6 +16,7 @@ public partial class Initial_Migration : Migration
             columns: table => new
             {
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                 CountryName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                 State = table.Column<string>(type: "nvarchar(max)", nullable: false),
                 Locality = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -87,6 +92,7 @@ public partial class Initial_Migration : Migration
             .Annotation("SqlServer:Clustered", true);
     }
 
+    /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropTable(

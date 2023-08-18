@@ -1,0 +1,118 @@
+﻿@page "/entries"
+@using LetsEncrypt.Managers.Interfaces;
+@using LetsEncrypt.Model;
+@inject ICertificateEntryManager _certificateEntryManager
+@inject IDialogService _dialogService
+
+<MudCard>
+    <MudCardContent>
+        <PageTitle>Let's Encrypt Dashboard</PageTitle>
+
+        <MudText Typo="Typo.h3" GutterBottom="true">Let's Encrypt Dashboard</MudText>
+        <MudText Class="mb-8">The following list contains all certificate entries that are managed by Let's Encrypt.</MudText>
+
+        @if (_certificateEntries == null)
+        {
+            <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+        }
+        else
+        {
+            <MudTable T="CertificateEntry" Items="_certificateEntries" Hover="true" SortLabel="Sort By" Elevation="0"
+            @ref="_mudTable" RowClassFunc="@SelectedRowClassFunc" OnRowClick="@OnRowClick" MultiSelection="false">
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<CertificateEntry, object>(x=>x.DomainName)">Domain</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<CertificateEntry, object>(x=>x.Email)">Email address</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<CertificateEntry, object>(x=>x.RenewedOn)">Renewed on</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<CertificateEntry, object>(x=>x.ExpiresOn)">Expires on</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Domain">@context.DomainName</MudTd>
+                    <MudTd DataLabel="Email address">@context.Email</MudTd>
+                    <MudTd DataLabel="Renewed on">@context.RenewedOn?.ToString("MMMM d, yyyy")</MudTd>
+                    <MudTd DataLabel="Expires on">@context.ExpiresOn?.ToString("MMMM d, yyyy")</MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+
+    </MudCardContent>
+    <MudCardActions>
+        <MudButton @onclick="AddCertificate" Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add">New</MudButton>
+        <MudButton @onclick="AddCertificate" Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Edit">Edit</MudButton>
+        <MudButton @onclick="RemoveCertificate" @ref="_removeButton" Variant=" Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Delete">Remove</MudButton>
+    </MudCardActions>
+</MudCard>
+
+<style>
+    .my-custom-blur {
+        backdrop-filter: blur(3px);
+    }
+
+    .selected {
+        background-color: #1E88E5 !important;
+    }
+
+        .selected > td {
+            color: white !important;
+        }
+
+            .selected > td .mud-input {
+                color: white !important;
+            }
+</style>
+
+
+@code
+{
+    IList<CertificateEntry>? _certificateEntries;
+    private MudTable<CertificateEntry> _mudTable;
+    private MudButton _removeButton;
+    private HashSet<CertificateEntry> _selectedCertificateEntries = new HashSet<CertificateEntry>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _certificateEntries = await _certificateEntryManager.GetCertificateEntries();
+    }
+
+    void OnRowClick(TableRowClickEventArgs<CertificateEntry> args)
+    {
+
+    }
+
+    private string SelectedRowClassFunc(CertificateEntry element, int rowNumber)
+    {
+        if (_mudTable.SelectedItem != null && _mudTable.SelectedItem.Equals(element))
+        {
+            return "selected";
+        }
+
+        return string.Empty;
+    }
+
+    private async void AddCertificate()
+    {
+        var options = new DialogOptions { ClassBackground = "my-custom-blur", CloseOnEscapeKey = true };
+        var reference = await _dialogService.ShowAsync<AddCertificateDialog>("Add a new Let's Encrypt certificate entry", options);
+        var result = await reference.Result;
+        if (result.Data != null && (bool)result.Data == true)
+        {
+            _certificateEntries = await _certificateEntryManager.GetCertificateEntries();
+            StateHasChanged();
+        }
+    }
+
+    private async void RemoveCertificate()
+    {
+        if (_mudTable.SelectedItem != null)
+        {
+            bool? result = await _dialogService.ShowMessageBox("Deleting a Let's Encrypt certificate entry", "You are about to delete a Let's Encrypt certificate entry. Are you sure about this?", yesText: "Delete", cancelText: "Cancel");
+
+            if (result != null && result.Value)
+            {
+                await _certificateEntryManager.RemoveCertificateEntry(_mudTable.SelectedItem);
+
+                _certificateEntries = await _certificateEntryManager.GetCertificateEntries();
+                StateHasChanged();
+            }
+        }
+    }
+}

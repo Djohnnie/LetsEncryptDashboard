@@ -17,14 +17,14 @@ public class ConfigurationManager : IConfigurationManager
 
     public Task<int> GetWorkerDelay()
     {
-        return GetValue("WORKER_DELAY", Convert.ToInt32);
+        return GetValue("WORKER_DELAY", Convert.ToInt32, 1000);
     }
 
-    private async Task<T> GetValue<T>(string configurationName, Func<string, T> conversion)
+    private async Task<T> GetValue<T>(string configurationName, Func<string, T> conversion, T defaultValue)
     {
         var configurationValue =
             await _dbContext.ConfigurationSettings.SingleOrDefaultAsync(x => x.Name == configurationName);
 
-        return conversion(configurationValue.Value);
+        return configurationValue != null ? conversion(configurationValue.Value) : defaultValue;
     }
 }

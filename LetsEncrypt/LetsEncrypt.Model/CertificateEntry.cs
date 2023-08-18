@@ -5,6 +5,7 @@ namespace LetsEncrypt.Model;
 
 public class CertificateEntry : ModelBase
 {
+    public string Email { get; set; }
     public string CountryName { get; set; }
     public string State { get; set; }
     public string Locality { get; set; }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LetsEncrypt.DataAccess.Interfaces;
@@ -23,5 +22,24 @@ public class CertificateEntryManager : ICertificateEntryManager
         var certificateEntries = await _dbContext.CertificateEntries
             .OrderBy(x => x.ExpiresOn).ToListAsync();
         return certificateEntries;
+    }
+
+    public async Task AddCertificateEntry(CertificateEntry certificateEntry)
+    {
+        _dbContext.CertificateEntries.Add(certificateEntry);
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task UpdateCertificateEntry(CertificateEntry certificateEntry)
+    {
+        await _dbContext.CertificateEntries.Where(x => x.Id == certificateEntry.Id)
+            .ExecuteUpdateAsync(x => x
+                .SetProperty(p => p.RenewedOn, certificateEntry.RenewedOn)
+                .SetProperty(p => p.ExpiresOn, certificateEntry.ExpiresOn));
+    }
+
+    public async Task RemoveCertificateEntry(CertificateEntry certificateEntry)
+    {
+        await _dbContext.CertificateEntries.Where(x => x.Id == certificateEntry.Id).ExecuteDeleteAsync();
     }
 }

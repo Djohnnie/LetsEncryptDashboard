@@ -1,3 +1,4 @@
+using LetsEncrypt.Dashboard.Processing;
 using LetsEncrypt.Dashboard.Workers;
 using LetsEncrypt.Managers.DependencyInjection;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
@@ -10,8 +11,11 @@ StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configurat
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
-builder.Services.AddHostedService<CertificateOrderWorker>();
+builder.Services.AddHostedService<CertificateWorker>();
+builder.Services.AddScoped<CertificateProcessor>();
 builder.Services.AddManagers();
+
+builder.Configuration.AddEnvironmentVariables();
 
 var app = builder.Build();
 

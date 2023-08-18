@@ -7,19 +7,23 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
+#nullable disable
+
 namespace LetsEncrypt.DataAccess.Migrations
 {
     [DbContext(typeof(LetsEncryptDbContext))]
-    [Migration("20210709150231_Initial_Migration")]
+    [Migration("20230605095403_Initial_Migration")]
     partial class Initial_Migration
     {
+        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.7")
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "7.0.5")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("LetsEncrypt.Model.CertificateEntry", b =>
                 {
@@ -32,6 +36,10 @@ namespace LetsEncrypt.DataAccess.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DomainName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -62,16 +70,19 @@ namespace LetsEncrypt.DataAccess.Migrations
 
                     b.Property<int>("SysId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
-                    b.HasKey("Id")
-                        .IsClustered(false);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SysId"));
 
-                    b.HasIndex("SysId")
-                        .IsClustered();
+                    b.HasKey("Id");
 
-                    b.ToTable("CERTIFICATE_ENTRIES");
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"), false);
+
+                    b.HasIndex("SysId");
+
+                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("SysId"));
+
+                    b.ToTable("CERTIFICATE_ENTRIES", (string)null);
                 });
 
             modelBuilder.Entity("LetsEncrypt.Model.ConfigurationSetting", b =>
@@ -86,20 +97,23 @@ namespace LetsEncrypt.DataAccess.Migrations
 
                     b.Property<int>("SysId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SysId"));
 
                     b.Property<string>("Value")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id")
-                        .IsClustered(false);
+                    b.HasKey("Id");
 
-                    b.HasIndex("SysId")
-                        .IsClustered();
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"), false);
 
-                    b.ToTable("CONFIGURATION_SETTINGS");
+                    b.HasIndex("SysId");
+
+                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("SysId"));
+
+                    b.ToTable("CONFIGURATION_SETTINGS", (string)null);
                 });
 
             modelBuilder.Entity("LetsEncrypt.Model.LoggingEntry", b =>
@@ -121,18 +135,21 @@ namespace LetsEncrypt.DataAccess.Migrations
 
                     b.Property<int>("SysId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
-                    b.HasKey("Id")
-                        .IsClustered(false);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SysId"));
+
+                    b.HasKey("Id");
+
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"), false);
 
                     b.HasIndex("DateTime");
 
-                    b.HasIndex("SysId")
-                        .IsClustered();
+                    b.HasIndex("SysId");
 
-                    b.ToTable("LOGGING_ENTRIES");
+                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("SysId"));
+
+                    b.ToTable("LOGGING_ENTRIES", (string)null);
                 });
 #pragma warning restore 612, 618
         }

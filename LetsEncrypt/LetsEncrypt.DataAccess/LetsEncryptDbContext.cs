@@ -42,6 +42,8 @@ public class LetsEncryptDbContext : DbContext, ILetsEncryptDbContext
         {
             entityBuilder.ToTable("CERTIFICATE_ENTRIES");
             entityBuilder.HasIdAndSysId();
+            entityBuilder.Property(p => p.Email)
+                .IsRequired();
             entityBuilder.Property(p => p.CountryName)
                 .IsRequired();
             entityBuilder.Property(p => p.State)
