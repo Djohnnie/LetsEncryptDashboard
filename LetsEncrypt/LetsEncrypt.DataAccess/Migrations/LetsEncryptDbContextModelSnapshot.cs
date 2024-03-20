@@ -17,7 +17,7 @@ namespace LetsEncrypt.DataAccess.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.5")
+                .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -80,37 +80,6 @@ namespace LetsEncrypt.DataAccess.Migrations
                     SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("SysId"));
 
                     b.ToTable("CERTIFICATE_ENTRIES", (string)null);
-                });
-
-            modelBuilder.Entity("LetsEncrypt.Model.ConfigurationSetting", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SysId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SysId"));
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"), false);
-
-                    b.HasIndex("SysId");
-
-                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("SysId"));
-
-                    b.ToTable("CONFIGURATION_SETTINGS", (string)null);
                 });
 
             modelBuilder.Entity("LetsEncrypt.Model.LoggingEntry", b =>

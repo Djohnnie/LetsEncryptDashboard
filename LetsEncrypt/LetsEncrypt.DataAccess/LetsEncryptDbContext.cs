@@ -12,7 +12,6 @@ public class LetsEncryptDbContext : DbContext, ILetsEncryptDbContext
 {
     private readonly IConfiguration _configuration;
 
-    public DbSet<ConfigurationSetting> ConfigurationSettings { get; set; }
     public DbSet<CertificateEntry> CertificateEntries { get; set; }
     public DbSet<LoggingEntry> LoggingEntries { get; set; }
 
@@ -28,16 +27,6 @@ public class LetsEncryptDbContext : DbContext, ILetsEncryptDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ConfigurationSetting>(entityBuilder =>
-        {
-            entityBuilder.ToTable("CONFIGURATION_SETTINGS");
-            entityBuilder.HasIdAndSysId();
-            entityBuilder.Property(p => p.Name)
-                .IsRequired();
-            entityBuilder.Property(p => p.Value)
-                .IsRequired();
-        });
-
         modelBuilder.Entity<CertificateEntry>(entityBuilder =>
         {
             entityBuilder.ToTable("CERTIFICATE_ENTRIES");
