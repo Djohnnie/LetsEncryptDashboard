@@ -43,7 +43,7 @@ namespace LetsEncrypt.Worker
                     {
                         _logger.LogInformation("Verifying '{certificateDomainName}'", certificateEntry.DomainName);
 
-                        if (certificateEntry.ExpiresOn < DateTime.UtcNow.Date.AddDays(30))
+                        if (certificateEntry.ExpiresOn == null || certificateEntry.ExpiresOn < DateTime.UtcNow.Date.AddDays(30))
                         {
                             await certificateProcessor.Process(certificateEntry);
                             await certificateEntryManager.UpdateCertificateEntry(certificateEntry);
