@@ -33,14 +33,14 @@ steps:
   inputs:
     command: 'restore'
     projects: | 
-      **/LetsEncrypt/LetsEncrypt.Worker.csproj
+      **/LetsEncrypt.Worker.csproj
 
 - task: DotNetCoreCLI@2
   displayName: Build Solution
   inputs:
     command: 'build'
     projects: | 
-      **/LetsEncrypt/LetsEncrypt.Worker.csproj
+      **/LetsEncrypt.Worker.csproj
 
 - script: |
     dotnet publish ./LetsEncrypt/LetsEncrypt.Worker --configuration "Release" --output ./LetsEncrypt/LetsEncrypt.Worker/bin/Release/publish
