@@ -82,7 +82,7 @@ internal class CertificateProcessor
         _logger.LogInformation(" 8. Building PFX...");
         var pfxBuilder = cert.ToPfx(privateKey);
         var pfx = pfxBuilder.Build(certificateEntry.DomainName, certificatePassword);
-        File.WriteAllBytes(Path.Combine(certificatePath, $"{certificateEntry}.pfx"), pfx);
+        File.WriteAllBytes(Path.Combine(certificatePath, $"{certificateEntry.DomainName}.pfx"), pfx);
     }
 
     private async Task ValidateOrder(IOrderContext order, CertificateEntry certificateEntry)
