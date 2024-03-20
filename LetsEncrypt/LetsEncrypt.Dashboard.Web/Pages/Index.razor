@@ -1,25 +1,52 @@
-﻿
-@using LetsEncrypt.Model
+﻿@using LetsEncrypt.Model
 @inherits OwningComponentBase
 @page "/"
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Let's Encrypt Dashboard'</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">Hello, world!</MudText>
-<MudText Class="mb-8">Welcome to your new app, powered by MudBlazor!</MudText>
+<MudText Typo="Typo.h6" GutterBottom="true">Let's Encrypt Dashboard</MudText>
+<MudText Class="mb-8">The following domains are registered to get their certificates auto-renewed using Let's Encrypt.'</MudText>
 
-<MudDataGrid T="CertificateEntry" Items="@Elements" ReadOnly="@_readOnly" EditMode="@(_isCellEditMode ? DataGridEditMode.Cell : DataGridEditMode.Form)"
-             StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
-             Bordered="true" Dense="true" EditTrigger="@(_editTriggerRowClick ? DataGridEditTrigger.OnRowClick : DataGridEditTrigger.Manual)">
-    <Columns>
-        <PropertyColumn Property="x => x.DomainName" Title="Domain Name" />
-        <PropertyColumn Property="x => x.CountryName" Hidden="true" Title="Country Name" />
-        <PropertyColumn Property="x => x.ExpiresOn" Title="Expires On" />
-        <TemplateColumn Hidden="@(_isCellEditMode || _readOnly || _editTriggerRowClick)" CellClass="d-flex justify-end">
-            <CellTemplate>
-                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
-            </CellTemplate>
-        </TemplateColumn>
-    </Columns>
-</MudDataGrid>
+<MudGrid>
+    <MudItem xs="12">
+        <MudCard Outlined>
+            <MudDataGrid T="CertificateEntry" Elevation="0" Items="@Elements" ReadOnly="@_readOnly" EditMode="@(_isCellEditMode ? DataGridEditMode.Cell : DataGridEditMode.Form)"
+                         SelectedItemChanged="@SelectedItemChanged"
+                         Bordered="true" Dense="true" EditTrigger="@(_editTriggerRowClick ? DataGridEditTrigger.OnRowClick : DataGridEditTrigger.Manual)">
+                <Columns>
+                    <PropertyColumn Property="x => x.DomainName" Title="Domain Name" />
+                    <PropertyColumn Property="x => x.Email" Hidden="true" Title="Email" />
+                    <PropertyColumn Property="x => x.ExpiresOn" Title="Expires On" />
+                </Columns>
+            </MudDataGrid>
+        </MudCard>
+    </MudItem>
+</MudGrid>
 
+<br />
+<br />
+<MudText Class="mb-8">Use the following form to add or edit registered domains.</MudText>
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudCard Outlined>
+            <MudPaper Class="pa-4" Elevation="0">
+                <MudForm>
+                    <MudTextField T="string" @bind-Value="@DomainName" Label="Domain name" Required="true" RequiredError="Domain name is required!" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Key" />
+                    <MudTextField T="string" @bind-Value="@Email" Label="Email address for registration" Required="true" RequiredError="Email is required!" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Email" />
+                    <MudTextField T="string" @bind-Value="@Organization" Label="Organization" Required="true" RequiredError="Organization is required!" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Domain" />
+                    <MudTextField T="string" @bind-Value="@OrganizationUnit" Label="Organization Unit" Required="true" RequiredError="Organization Unit is required!" />
+                    <MudTextField T="string" @bind-Value="@Country" Label="Country" Required="true" RequiredError="Country is required!" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Flag" />
+                    <MudTextField T="string" @bind-Value="@State" Label="State" Required="true" RequiredError="State is required!" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.LocationCity" />
+                    <MudTextField T="string" @bind-Value="@Locality" Label="Locality" Required="true" RequiredError="Locality is required!" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.House" />
+                    <p />
+                    <div class="d-flex align-center justify-space-between">
+                        <MudCheckBox T="bool" Label="Staging Environment" />
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto"
+                                   OnClick="OnCreateCertificateEntryCommand">Create</MudButton>
+                    </div>
+                </MudForm>
+            </MudPaper>
+        </MudCard>
+    </MudItem>
+</MudGrid>

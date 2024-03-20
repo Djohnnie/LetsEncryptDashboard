@@ -35,7 +35,8 @@ public class CertificateEntryManager : ICertificateEntryManager
         await _dbContext.CertificateEntries.Where(x => x.Id == certificateEntry.Id)
             .ExecuteUpdateAsync(x => x
                 .SetProperty(p => p.RenewedOn, certificateEntry.RenewedOn)
-                .SetProperty(p => p.ExpiresOn, certificateEntry.ExpiresOn));
+                .SetProperty(p => p.ExpiresOn, certificateEntry.ExpiresOn)
+                .SetProperty(p => p.AccountPem, certificateEntry.AccountPem));
     }
 
     public async Task RemoveCertificateEntry(CertificateEntry certificateEntry)

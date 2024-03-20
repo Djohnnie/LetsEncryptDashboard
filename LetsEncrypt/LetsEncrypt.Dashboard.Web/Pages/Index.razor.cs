@@ -5,33 +5,58 @@ namespace LetsEncrypt.Dashboard.Web.Pages;
 
 public partial class Index
 {
-    private IEnumerable<CertificateEntry> Elements = new List<CertificateEntry>();
+    private List<CertificateEntry> Elements = new List<CertificateEntry>();
     private bool _readOnly;
     private bool _isCellEditMode;
     private List<string> _events = new();
     private bool _editTriggerRowClick;
+
+    protected string DomainName { get; set; }
+    protected string Email { get; set; }
+    protected string Organization { get; set; }
+    protected string OrganizationUnit { get; set; }
+    protected string Country { get; set; }
+    protected string State { get; set; }
+    protected string Locality { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         var certificateEntryManager = ScopedServices.GetRequiredService<ICertificateEntryManager>();
         var certificates = await certificateEntryManager.GetCertificateEntries();
 
-        Elements = certificates;
+        Elements = certificates.ToList();
     }
 
-    // events
-    void StartedEditingItem(CertificateEntry item)
+    async Task OnCreateCertificateEntryCommand()
     {
-        _events.Insert(0, $"Event = StartedEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+        var entry = new CertificateEntry
+        {
+            DomainName = DomainName,
+            Email = Email,
+            Organization = Organization,
+            OrganizationUnit = OrganizationUnit,
+            CountryName = Country,
+            State = State,
+            Locality = Locality
+        };
+
+        var certificateEntryManager = ScopedServices.GetRequiredService<ICertificateEntryManager>();
+        await certificateEntryManager.AddCertificateEntry(entry);
+
+        var certificates = await certificateEntryManager.GetCertificateEntries();
+        Elements = certificates.ToList();
+
+        StateHasChanged();
     }
 
-    void CanceledEditingItem(CertificateEntry item)
+    void SelectedItemChanged(CertificateEntry item)
     {
-        _events.Insert(0, $"Event = CanceledEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
-    }
-
-    void CommittedItemChanges(CertificateEntry item)
-    {
-        _events.Insert(0, $"Event = CommittedItemChanges, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+        DomainName = item.DomainName;
+        Email = item.Email;
+        Organization = item.Organization;
+        OrganizationUnit = item.OrganizationUnit;
+        Country = item.CountryName;
+        State = item.State;
+        Locality = item.Locality;
     }
 }

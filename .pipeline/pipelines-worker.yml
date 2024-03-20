@@ -1,0 +1,52 @@
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - LetsEncrypt/LetsEncrypt.Worker/*
+    - LetsEncrypt/LetsEncrypt.Managers/*
+    - LetsEncrypt/LetsEncrypt.DataAccess/*
+    - LetsEncrypt/LetsEncrypt.Model/*
+    - .pipeline/pipelines-worker.yml
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  solution: '*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+
+- task: UseDotNet@2
+  displayName: 'Use .NET SDK (8.0)'
+  inputs:
+    packageType: sdk
+    version: 8.0.203
+    includePreviewVersions: true
+    installationPath: $(Agent.ToolsDirectory)/dotnet
+
+- task: DotNetCoreCLI@2
+  displayName: Restore NuGet packages
+  inputs:
+    command: 'restore'
+    projects: | 
+      **/LetsEncrypt/LetsEncrypt.Worker.csproj
+
+- task: DotNetCoreCLI@2
+  displayName: Build Solution
+  inputs:
+    command: 'build'
+    projects: | 
+      **/LetsEncrypt/LetsEncrypt.Worker.csproj
+
+- script: |
+    dotnet publish ./LetsEncrypt/LetsEncrypt.Worker --configuration "Release" --output ./LetsEncrypt/LetsEncrypt.Worker/bin/Release/publish
+
+- script: |
+    cd ./LetsEncrypt/LetsEncrypt.Worker
+    docker build -t djohnnie/letsencrypt-worker .
+    docker login -u '$(dockerId)' -p '$(dockerPwd)'
+    docker push djohnnie/letsencrypt-worker

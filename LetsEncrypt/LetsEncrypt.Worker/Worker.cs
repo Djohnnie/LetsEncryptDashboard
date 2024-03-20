@@ -9,13 +9,16 @@ namespace LetsEncrypt.Worker
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ICertificateEntryManager _certificateEntryManager;
         private readonly ILogger<Worker> _logger;
+        private readonly IConfiguration _configuration;
 
         public Worker(
             IServiceScopeFactory serviceScopeFactory,
-            ILogger<Worker> logger)
+            ILogger<Worker> logger,
+            IConfiguration configuration)
         {
             _serviceScopeFactory = serviceScopeFactory;
             _logger = logger;
+            _configuration = configuration;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -23,7 +26,6 @@ namespace LetsEncrypt.Worker
             while (!stoppingToken.IsCancellationRequested)
             {
                 using var serviceScope = _serviceScopeFactory.CreateAsyncScope();
-                var configurationManager = serviceScope.ServiceProvider.GetRequiredService<IConfigurationManager>();
                 var certificateEntryManager = serviceScope.ServiceProvider.GetRequiredService<ICertificateEntryManager>();
                 var certificateProcessor = serviceScope.ServiceProvider.GetRequiredService<CertificateProcessor>();
 
@@ -34,17 +36,19 @@ namespace LetsEncrypt.Worker
                 try
                 {
                     var stopwatch = Stopwatch.StartNew();
-                    //delay = await configurationManager.GetWorkerDelay();
+                    delay = _configuration.GetValue<int>("WORKER_INTERVAL") * 1000 * 60;
                     var certificateEntries = await certificateEntryManager.GetCertificateEntries();
 
                     foreach (var certificateEntry in certificateEntries)
                     {
                         _logger.LogInformation("Verifying '{certificateDomainName}'", certificateEntry.DomainName);
 
-                        if (certificateEntry.ExpiresOn < DateTime.UtcNow.Date.AddDays(28))
+                        if (certificateEntry.ExpiresOn < DateTime.UtcNow.Date.AddDays(30))
                         {
-                            //await certificateProcessor.Process(certificateEntry);
+                            await certificateProcessor.Process(certificateEntry);
                             await certificateEntryManager.UpdateCertificateEntry(certificateEntry);
+
+                            await Task.Delay(1000);
                         }
                     }
 

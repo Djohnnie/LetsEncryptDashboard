@@ -13,6 +13,7 @@ public class CertificateEntry : ModelBase
     public string OrganizationUnit { get; set; }
     public string DomainName { get; set; }
     public bool IsStaging { get; set; }
+    public string AccountPem { get; set; }
     public DateTime? RenewedOn { get; set; }
     public DateTime? ExpiresOn { get; set; }
 }
