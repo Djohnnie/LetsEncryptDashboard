@@ -45,8 +45,15 @@ namespace LetsEncrypt.Worker
 
                         if (certificateEntry.ExpiresOn == null || certificateEntry.ExpiresOn < DateTime.UtcNow.Date.AddDays(30))
                         {
-                            await certificateProcessor.Process(certificateEntry);
-                            await certificateEntryManager.UpdateCertificateEntry(certificateEntry);
+                            try
+                            {
+                                await certificateProcessor.Process(certificateEntry);
+                                await certificateEntryManager.UpdateCertificateEntry(certificateEntry);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError("Error while processing '{certificateEntry}': {exceptionMessage}", certificateEntry.DomainName, ex.Message);
+                            }
 
                             await Task.Delay(1000);
                         }
