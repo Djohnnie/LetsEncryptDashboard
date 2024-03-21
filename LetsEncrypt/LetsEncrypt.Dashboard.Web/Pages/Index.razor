@@ -16,7 +16,22 @@
                 <Columns>
                     <PropertyColumn Property="x => x.DomainName" Title="Domain Name" />
                     <PropertyColumn Property="x => x.Email" Hidden="true" Title="Email" />
-                    <PropertyColumn Property="x => x.ExpiresOn" Title="Expires On" />
+                    <PropertyColumn Property="x => x.RenewedOn" Format="dd-MM-yyyy HH:mm" Title="Renewed On" />
+                    <PropertyColumn Property="x => x.ExpiresOn" Format="dd-MM-yyyy HH:mm" Title="Expires On" />
+                    <TemplateColumn CellClass="d-flex justify-end">
+                        <CellTemplate>
+                            @if (context.Item.LastError != null)
+                            {
+                                <MudTooltip Text="@context.Item.LastError" Placement="Placement.Left">
+                                    <MudIcon Icon="@Icons.Material.Filled.Error" Color="Color.Error" Title="Error" />
+                                </MudTooltip>
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success" Title="Success" />
+                            }
+                        </CellTemplate>
+                    </TemplateColumn>
                 </Columns>
             </MudDataGrid>
         </MudCard>

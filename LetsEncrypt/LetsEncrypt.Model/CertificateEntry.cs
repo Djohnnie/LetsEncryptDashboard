@@ -16,4 +16,5 @@ public class CertificateEntry : ModelBase
     public string AccountPem { get; set; }
     public DateTime? RenewedOn { get; set; }
     public DateTime? ExpiresOn { get; set; }
+    public string LastError { get; set; }
 }

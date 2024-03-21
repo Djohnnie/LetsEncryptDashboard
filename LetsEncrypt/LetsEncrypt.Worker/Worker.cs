@@ -48,12 +48,15 @@ namespace LetsEncrypt.Worker
                             try
                             {
                                 await certificateProcessor.Process(certificateEntry);
-                                await certificateEntryManager.UpdateCertificateEntry(certificateEntry);
+                                certificateEntry.LastError = null;
                             }
                             catch (Exception ex)
                             {
+                                certificateEntry.LastError = ex.Message;
                                 _logger.LogError("Error while processing '{certificateEntry}': {exceptionMessage}", certificateEntry.DomainName, ex.Message);
                             }
+
+                            await certificateEntryManager.UpdateCertificateEntry(certificateEntry);
 
                             await Task.Delay(1000);
                         }
