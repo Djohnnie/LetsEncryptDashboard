@@ -1,3 +1,4 @@
+using Certes;
 using LetsEncrypt.Managers.Interfaces;
 using LetsEncrypt.Worker.Processing;
 using System.Diagnostics;
@@ -49,6 +50,11 @@ namespace LetsEncrypt.Worker
                             {
                                 await certificateProcessor.Process(certificateEntry);
                                 certificateEntry.LastError = null;
+                            }
+                            catch (AcmeRequestException ex)
+                            {
+                                certificateEntry.LastError = ex.Error.Detail;
+                                _logger.LogError("Error while processing '{certificateEntry}': {exceptionMessage}", certificateEntry.DomainName, ex.Error.Detail);
                             }
                             catch (Exception ex)
                             {
