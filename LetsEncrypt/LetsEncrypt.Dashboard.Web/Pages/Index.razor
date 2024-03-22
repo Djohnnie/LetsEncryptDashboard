@@ -16,8 +16,16 @@
                 <Columns>
                     <PropertyColumn Property="x => x.DomainName" Title="Domain Name" />
                     <PropertyColumn Property="x => x.Email" Hidden="true" Title="Email" />
-                    <PropertyColumn Property="x => x.RenewedOn" Format="dd-MM-yyyy HH:mm" Title="Renewed On" />
-                    <PropertyColumn Property="x => x.ExpiresOn" Format="dd-MM-yyyy HH:mm" Title="Expires On" />
+                    <TemplateColumn Title="Renewed On">
+                        <CellTemplate>
+                            @ConvertRenewedOnToDescription(context.Item)
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn Title="Expires On">
+                        <CellTemplate>
+                            @ConvertExpiresOnToDescription(context.Item)
+                        </CellTemplate>
+                    </TemplateColumn>
                     <TemplateColumn CellClass="d-flex justify-end">
                         <CellTemplate>
                             @if (context.Item.LastError != null)
@@ -28,7 +36,9 @@
                             }
                             else
                             {
-                                <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success" Title="Success" />
+                                <MudTooltip Text="Last renewal was successful!" Placement="Placement.Left">
+                                    <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success" Title="Success" />
+                                </MudTooltip>
                             }
                         </CellTemplate>
                     </TemplateColumn>
@@ -40,7 +50,7 @@
 
 <br />
 <br />
-<MudText Class="mb-8">Use the following form to add or edit registered domains.</MudText>
+<MudText Class="mb-8">Use the following form to add domains.</MudText>
 
 <MudGrid>
     <MudItem xs="12">

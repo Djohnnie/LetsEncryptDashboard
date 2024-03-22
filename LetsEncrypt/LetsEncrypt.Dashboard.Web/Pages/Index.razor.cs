@@ -59,4 +59,30 @@ public partial class Index
         State = item.State;
         Locality = item.Locality;
     }
+
+    private string ConvertRenewedOnToDescription(CertificateEntry item)
+    {
+        var result = "N.A.";
+
+        if (item.RenewedOn.HasValue)
+        {
+            var numberOfDays = (int)Math.Round((DateTime.Now - item.RenewedOn).Value.TotalDays);
+            result = $"{item.RenewedOn:MMMM d, yyyy} ({numberOfDays} {(numberOfDays == 1 ? "day" : "days")} ago)";
+        }
+
+        return result;
+    }
+
+    private string ConvertExpiresOnToDescription(CertificateEntry item)
+    {
+        var result = "N.A.";
+
+        if (item.ExpiresOn.HasValue)
+        {
+            var numberOfDays = (int)Math.Round((item.ExpiresOn - DateTime.Now).Value.TotalDays);
+            result = $"{item.ExpiresOn:MMMM d, yyyy} (in {numberOfDays} {(numberOfDays == 1 ? "day" : "days")})";
+        }
+
+        return result;
+    }
 }
