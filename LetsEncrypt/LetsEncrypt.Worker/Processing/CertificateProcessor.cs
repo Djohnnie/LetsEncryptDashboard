@@ -49,8 +49,7 @@ internal class CertificateProcessor
 
         if (File.Exists(certPath))
         {
-            var collection = new X509Certificate2Collection();
-            collection.Import(certPath, certPass, X509KeyStorageFlags.PersistKeySet);
+            var collection = X509CertificateLoader.LoadPkcs12CollectionFromFile(certPath, certPass, X509KeyStorageFlags.PersistKeySet);
 
             foreach (var cert in collection)
             {
@@ -82,7 +81,15 @@ internal class CertificateProcessor
         _logger.LogInformation(" 8. Building PFX...");
         var pfxBuilder = cert.ToPfx(privateKey);
         var pfx = pfxBuilder.Build(certificateEntry.DomainName, certificatePassword);
-        File.WriteAllBytes(Path.Combine(certificatePath, $"{certificateEntry.DomainName}.pfx"), pfx);
+        await File.WriteAllBytesAsync(Path.Combine(certificatePath, $"{certificateEntry.DomainName}.pfx"), pfx);
+
+        var x509Cert = X509CertificateLoader.LoadPkcs12(pfx, certificatePassword, X509KeyStorageFlags.Exportable);
+        var x509CertRawData = x509Cert.GetRawCertData();
+        await File.WriteAllBytesAsync(Path.Combine(certificatePath, $"{certificateEntry.DomainName}.cer"), x509CertRawData);
+
+        var x509CertPrivateKey = x509Cert.GetECDsaPrivateKey();
+        var x509CertPrivateKeyPem = x509CertPrivateKey.ExportECPrivateKeyPem();
+        await File.WriteAllTextAsync(Path.Combine(certificatePath, $"{certificateEntry.DomainName}.key"), x509CertPrivateKeyPem);
     }
 
     private async Task ValidateOrder(IOrderContext order, CertificateEntry certificateEntry)
