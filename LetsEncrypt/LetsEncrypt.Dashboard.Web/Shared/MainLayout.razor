@@ -21,7 +21,7 @@
 @code
 {
     MudTheme _theme = new();
-    string modeIcon => _isDarkMode ? Icons.Outlined.DarkMode : @Icons.Outlined.LightMode;
+    string modeIcon => _isDarkMode ? @Icons.Material.Outlined.DarkMode : @Icons.Material.Outlined.LightMode;
     bool _isDarkMode = true;
 
     void ToggleDarkMode()
