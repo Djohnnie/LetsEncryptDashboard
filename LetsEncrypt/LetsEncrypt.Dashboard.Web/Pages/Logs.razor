@@ -1,0 +1,135 @@
+@inherits OwningComponentBase
+@page "/logs"
+
+<PageTitle>Logs - Let's Encrypt Dashboard</PageTitle>
+
+<div class="d-flex align-center justify-space-between mb-4">
+    <div>
+        <MudText Typo="Typo.h5" Style="font-weight: 600;">Activity Logs</MudText>
+        <MudText Typo="Typo.body2" Class="mud-text-secondary">
+            Certificate processing events and system messages.
+        </MudText>
+    </div>
+    <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh"
+               OnClick="LoadLogs" Style="text-transform: none;">
+        Refresh
+    </MudButton>
+</div>
+
+@* Summary chips *@
+<div class="d-flex gap-3 mb-4 flex-wrap">
+    <MudChip T="string" Color="@(_selectedLevel == null ? Color.Primary : Color.Default)"
+             Variant="@(_selectedLevel == null ? Variant.Filled : Variant.Outlined)"
+             OnClick="() => _selectedLevel = null" Style="cursor: pointer;">
+        All (@_logEntries.Count)
+    </MudChip>
+    <MudChip T="string" Color="@(_selectedLevel == LoggingLevel.Info ? Color.Info : Color.Default)"
+             Variant="@(_selectedLevel == LoggingLevel.Info ? Variant.Filled : Variant.Outlined)"
+             OnClick="() => _selectedLevel = LoggingLevel.Info" Style="cursor: pointer;">
+        Info (@_logEntries.Count(l => l.Level == LoggingLevel.Info))
+    </MudChip>
+    <MudChip T="string" Color="@(_selectedLevel == LoggingLevel.Debug ? Color.Secondary : Color.Default)"
+             Variant="@(_selectedLevel == LoggingLevel.Debug ? Variant.Filled : Variant.Outlined)"
+             OnClick="() => _selectedLevel = LoggingLevel.Debug" Style="cursor: pointer;">
+        Debug (@_logEntries.Count(l => l.Level == LoggingLevel.Debug))
+    </MudChip>
+    <MudChip T="string" Color="@(_selectedLevel == LoggingLevel.Error ? Color.Error : Color.Default)"
+             Variant="@(_selectedLevel == LoggingLevel.Error ? Variant.Filled : Variant.Outlined)"
+             OnClick="() => _selectedLevel = LoggingLevel.Error" Style="cursor: pointer;">
+        Error (@_logEntries.Count(l => l.Level == LoggingLevel.Error))
+    </MudChip>
+</div>
+
+<MudPaper Elevation="0" Style="border-radius: 12px; overflow: hidden;">
+    @if (_isLoading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+        <div class="pa-8 d-flex flex-column align-center">
+            <MudText Class="mud-text-secondary">Loading logs...</MudText>
+        </div>
+    }
+    else if (!FilteredEntries.Any())
+    {
+        <div class="pa-12 d-flex flex-column align-center">
+            <MudIcon Icon="@Icons.Material.Filled.Notes" Style="font-size: 4rem;" Color="Color.Secondary" />
+            <MudText Typo="Typo.h6" Class="mt-4" Color="Color.Secondary">No log entries</MudText>
+            <MudText Typo="Typo.body2" Class="mt-1 mud-text-secondary">
+                @if (_selectedLevel.HasValue)
+                {
+                    @($"No {_selectedLevel} entries found.")
+                }
+                else
+                {
+                    @("No log entries have been recorded yet.")
+                }
+            </MudText>
+        </div>
+    }
+    else
+    {
+        <MudTable Items="@FilteredEntries" Hover="true" Dense="true" Elevation="0"
+                  Breakpoint="Breakpoint.Sm" RowsPerPage="25">
+            <HeaderContent>
+                <MudTh Style="width: 100px;">Level</MudTh>
+                <MudTh Style="width: 200px;">Timestamp</MudTh>
+                <MudTh>Message</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <MudChip T="string" Size="Size.Small" Color="@GetLevelColor(context.Level)" Variant="Variant.Filled">
+                        @context.Level
+                    </MudChip>
+                </MudTd>
+                <MudTd>
+                    <MudText Typo="Typo.body2">@context.DateTime.ToString("yyyy-MM-dd HH:mm:ss")</MudText>
+                </MudTd>
+                <MudTd>
+                    <MudText Typo="Typo.body2">@context.Message</MudText>
+                </MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+    }
+</MudPaper>
+
+@code {
+    private List<LoggingEntry> _logEntries = new();
+    private bool _isLoading = true;
+    private LoggingLevel? _selectedLevel;
+
+    private IEnumerable<LoggingEntry> FilteredEntries =>
+        _selectedLevel.HasValue
+            ? _logEntries.Where(l => l.Level == _selectedLevel.Value)
+            : _logEntries;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadLogs();
+    }
+
+    private async Task LoadLogs()
+    {
+        _isLoading = true;
+
+        try
+        {
+            var manager = ScopedServices.GetRequiredService<ILoggingEntryManager>();
+            var entries = await manager.GetLoggingEntries();
+            _logEntries = entries.OrderByDescending(l => l.DateTime).ToList();
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private Color GetLevelColor(LoggingLevel level) => level switch
+    {
+        LoggingLevel.Info => Color.Info,
+        LoggingLevel.Debug => Color.Secondary,
+        LoggingLevel.Error => Color.Error,
+        _ => Color.Default
+    };
+}

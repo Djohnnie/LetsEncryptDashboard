@@ -1,0 +1,114 @@
+@using LetsEncrypt.Managers.Interfaces
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form" @bind-IsValid="_formIsValid">
+            <MudText Typo="Typo.body2" Class="mb-4" Color="Color.Tertiary">
+                Enter the details for the new SSL certificate domain registration.
+            </MudText>
+
+            <MudText Typo="Typo.subtitle2" Class="mb-2" Style="font-weight: 600;">Domain Information</MudText>
+            <MudGrid>
+                <MudItem xs="12" sm="8">
+                    <MudTextField T="string" @bind-Value="@DomainName" Label="Domain Name" Placeholder="example.com"
+                                  Required="true" RequiredError="Domain name is required!"
+                                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Language"
+                                  Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudTextField T="string" @bind-Value="@Email" Label="Email" Placeholder="admin@example.com"
+                                  Required="true" RequiredError="Email is required!"
+                                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Email"
+                                  Variant="Variant.Outlined" />
+                </MudItem>
+            </MudGrid>
+
+            <MudText Typo="Typo.subtitle2" Class="mt-4 mb-2" Style="font-weight: 600;">Organization Details</MudText>
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string" @bind-Value="@Organization" Label="Organization" Placeholder="Acme Inc."
+                                  Required="true" RequiredError="Organization is required!"
+                                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Business"
+                                  Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string" @bind-Value="@OrganizationUnit" Label="Organization Unit" Placeholder="IT Department"
+                                  Required="true" RequiredError="Organization Unit is required!"
+                                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AccountTree"
+                                  Variant="Variant.Outlined" />
+                </MudItem>
+            </MudGrid>
+
+            <MudText Typo="Typo.subtitle2" Class="mt-4 mb-2" Style="font-weight: 600;">Location</MudText>
+            <MudGrid>
+                <MudItem xs="12" sm="4">
+                    <MudTextField T="string" @bind-Value="@Country" Label="Country" Placeholder="US"
+                                  Required="true" RequiredError="Country is required!"
+                                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Flag"
+                                  Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudTextField T="string" @bind-Value="@State" Label="State" Placeholder="California"
+                                  Required="true" RequiredError="State is required!"
+                                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.LocationCity"
+                                  Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudTextField T="string" @bind-Value="@Locality" Label="Locality" Placeholder="San Francisco"
+                                  Required="true" RequiredError="Locality is required!"
+                                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Place"
+                                  Variant="Variant.Outlined" />
+                </MudItem>
+            </MudGrid>
+
+            <MudCheckBox T="bool" @bind-Value="@IsStaging" Label="Staging Environment"
+                         Class="mt-4" Color="Color.Secondary" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Variant="Variant.Text">Cancel</MudButton>
+        <MudButton OnClick="Submit" Variant="Variant.Filled" Color="Color.Primary"
+                   Disabled="@(!_formIsValid)" StartIcon="@Icons.Material.Filled.Add">
+            Add Certificate
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    MudForm _form = default!;
+    bool _formIsValid;
+
+    string DomainName { get; set; } = string.Empty;
+    string Email { get; set; } = string.Empty;
+    string Organization { get; set; } = string.Empty;
+    string OrganizationUnit { get; set; } = string.Empty;
+    string Country { get; set; } = string.Empty;
+    string State { get; set; } = string.Empty;
+    string Locality { get; set; } = string.Empty;
+    bool IsStaging { get; set; }
+
+    void Cancel() => MudDialog.Cancel();
+
+    async Task Submit()
+    {
+        await _form.Validate();
+        if (!_formIsValid) return;
+
+        var entry = new CertificateEntry
+        {
+            DomainName = DomainName,
+            Email = Email,
+            Organization = Organization,
+            OrganizationUnit = OrganizationUnit,
+            CountryName = Country,
+            State = State,
+            Locality = Locality,
+            IsStaging = IsStaging
+        };
+
+        MudDialog.Close(DialogResult.Ok(entry));
+    }
+}

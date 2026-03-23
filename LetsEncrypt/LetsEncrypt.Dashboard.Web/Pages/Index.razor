@@ -1,77 +1,162 @@
-﻿@using LetsEncrypt.Model
-@inherits OwningComponentBase
+﻿@inherits OwningComponentBase
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
 @page "/"
 
-<PageTitle>Let's Encrypt Dashboard'</PageTitle>
+<PageTitle>Let's Encrypt Dashboard</PageTitle>
 
-<MudText Typo="Typo.h6" GutterBottom="true">Let's Encrypt Dashboard</MudText>
-<MudText Class="mb-8">The following domains are registered to get their certificates auto-renewed using Let's Encrypt.'</MudText>
-
-<MudGrid>
-    <MudItem xs="12">
-        <MudCard Outlined>
-            <MudDataGrid T="CertificateEntry" Elevation="0" Items="@Elements" ReadOnly="@_readOnly" EditMode="@(_isCellEditMode ? DataGridEditMode.Cell : DataGridEditMode.Form)"
-                         SelectedItemChanged="@SelectedItemChanged"
-                         Bordered="true" Dense="true" EditTrigger="@(_editTriggerRowClick ? DataGridEditTrigger.OnRowClick : DataGridEditTrigger.Manual)">
-                <Columns>
-                    <PropertyColumn Property="x => x.DomainName" Title="Domain Name" />
-                    <PropertyColumn Property="x => x.Email" Hidden="true" Title="Email" />
-                    <TemplateColumn Title="Renewed On">
-                        <CellTemplate>
-                            @ConvertRenewedOnToDescription(context.Item)
-                        </CellTemplate>
-                    </TemplateColumn>
-                    <TemplateColumn Title="Expires On">
-                        <CellTemplate>
-                            @ConvertExpiresOnToDescription(context.Item)
-                        </CellTemplate>
-                    </TemplateColumn>
-                    <TemplateColumn CellClass="d-flex justify-end">
-                        <CellTemplate>
-                            @if (context.Item.LastError != null)
-                            {
-                                <MudTooltip Text="@context.Item.LastError" Placement="Placement.Left">
-                                    <MudIcon Icon="@Icons.Material.Filled.Error" Color="Color.Error" Title="Error" />
-                                </MudTooltip>
-                            }
-                            else
-                            {
-                                <MudTooltip Text="Last renewal was successful!" Placement="Placement.Left">
-                                    <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success" Title="Success" />
-                                </MudTooltip>
-                            }
-                        </CellTemplate>
-                    </TemplateColumn>
-                </Columns>
-            </MudDataGrid>
-        </MudCard>
+@* Summary Cards *@
+<MudGrid Class="mb-4">
+    <MudItem xs="12" sm="6" md="3">
+        <MudPaper Class="pa-4 d-flex align-center" Elevation="0" Style="border-radius: 12px;">
+            <MudAvatar Color="Color.Primary" Variant="Variant.Filled" Class="mr-4" Size="Size.Large">
+                <MudIcon Icon="@Icons.Material.Filled.Dns" />
+            </MudAvatar>
+            <div>
+                <MudText Typo="Typo.h4" Style="font-weight: 700;">@Elements.Count</MudText>
+                <MudText Typo="Typo.body2" Class="mud-text-secondary">Total Certificates</MudText>
+            </div>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="3">
+        <MudPaper Class="pa-4 d-flex align-center" Elevation="0" Style="border-radius: 12px;">
+            <MudAvatar Color="Color.Success" Variant="Variant.Filled" Class="mr-4" Size="Size.Large">
+                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" />
+            </MudAvatar>
+            <div>
+                <MudText Typo="Typo.h4" Style="font-weight: 700;">@_healthyCount</MudText>
+                <MudText Typo="Typo.body2" Class="mud-text-secondary">Healthy</MudText>
+            </div>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="3">
+        <MudPaper Class="pa-4 d-flex align-center" Elevation="0" Style="border-radius: 12px;">
+            <MudAvatar Color="Color.Warning" Variant="Variant.Filled" Class="mr-4" Size="Size.Large">
+                <MudIcon Icon="@Icons.Material.Filled.Schedule" />
+            </MudAvatar>
+            <div>
+                <MudText Typo="Typo.h4" Style="font-weight: 700;">@_expiringSoonCount</MudText>
+                <MudText Typo="Typo.body2" Class="mud-text-secondary">Expiring Soon</MudText>
+            </div>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="3">
+        <MudPaper Class="pa-4 d-flex align-center" Elevation="0" Style="border-radius: 12px;">
+            <MudAvatar Color="Color.Error" Variant="Variant.Filled" Class="mr-4" Size="Size.Large">
+                <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" />
+            </MudAvatar>
+            <div>
+                <MudText Typo="Typo.h4" Style="font-weight: 700;">@_errorCount</MudText>
+                <MudText Typo="Typo.body2" Class="mud-text-secondary">Errors</MudText>
+            </div>
+        </MudPaper>
     </MudItem>
 </MudGrid>
 
-<br />
-<br />
-<MudText Class="mb-8">Use the following form to add domains.</MudText>
+@* Certificates Table *@
+<MudPaper Elevation="0" Class="pa-0" Style="border-radius: 12px; overflow: hidden;">
+    <div class="d-flex align-center justify-space-between pa-4">
+        <div>
+            <MudText Typo="Typo.h6" Style="font-weight: 600;">Managed Certificates</MudText>
+            <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                Domains registered for automatic SSL certificate renewal via Let's Encrypt.
+            </MudText>
+        </div>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
+                   OnClick="OpenAddDialog" Style="text-transform: none; font-weight: 600;">
+            Add Certificate
+        </MudButton>
+    </div>
 
-<MudGrid>
-    <MudItem xs="12">
-        <MudCard Outlined>
-            <MudPaper Class="pa-4" Elevation="0">
-                <MudForm>
-                    <MudTextField T="string" @bind-Value="@DomainName" Label="Domain name" Required="true" RequiredError="Domain name is required!" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Key" />
-                    <MudTextField T="string" @bind-Value="@Email" Label="Email address for registration" Required="true" RequiredError="Email is required!" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Email" />
-                    <MudTextField T="string" @bind-Value="@Organization" Label="Organization" Required="true" RequiredError="Organization is required!" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Domain" />
-                    <MudTextField T="string" @bind-Value="@OrganizationUnit" Label="Organization Unit" Required="true" RequiredError="Organization Unit is required!" />
-                    <MudTextField T="string" @bind-Value="@Country" Label="Country" Required="true" RequiredError="Country is required!" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Flag" />
-                    <MudTextField T="string" @bind-Value="@State" Label="State" Required="true" RequiredError="State is required!" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.LocationCity" />
-                    <MudTextField T="string" @bind-Value="@Locality" Label="Locality" Required="true" RequiredError="Locality is required!" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.House" />
-                    <p />
-                    <div class="d-flex align-center justify-space-between">
-                        <MudCheckBox T="bool" Label="Staging Environment" />
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto"
-                                   OnClick="OnCreateCertificateEntryCommand">Create</MudButton>
-                    </div>
-                </MudForm>
-            </MudPaper>
-        </MudCard>
-    </MudItem>
-</MudGrid>
+    <MudDivider />
+
+    @if (_isLoading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+        <div class="pa-8 d-flex flex-column align-center">
+            <MudText Class="mud-text-secondary">Loading certificates...</MudText>
+        </div>
+    }
+    else if (!Elements.Any())
+    {
+        <div class="pa-12 d-flex flex-column align-center">
+            <MudIcon Icon="@Icons.Material.Filled.FolderOpen" Style="font-size: 4rem;" Color="Color.Secondary" />
+            <MudText Typo="Typo.h6" Class="mt-4" Color="Color.Secondary">No certificates yet</MudText>
+            <MudText Typo="Typo.body2" Class="mt-1 mud-text-secondary">
+                Click "Add Certificate" to register your first domain.
+            </MudText>
+        </div>
+    }
+    else
+    {
+        <MudDataGrid T="CertificateEntry" Items="@Elements" Hover="true" Dense="true"
+                     Filterable="true" FilterMode="DataGridFilterMode.Simple" FilterCaseSensitivity="DataGridFilterCaseSensitivity.CaseInsensitive"
+                     Elevation="0" RowClass="cursor-pointer">
+            <Columns>
+                <TemplateColumn Title="Status" Sortable="false" Filterable="false" CellStyle="width: 100px;">
+                    <CellTemplate>
+                        @{ var status = GetStatus(context.Item); }
+                        <MudChip T="string" Size="Size.Small" Color="@status.Color" Variant="Variant.Filled">
+                            @status.Label
+                        </MudChip>
+                    </CellTemplate>
+                </TemplateColumn>
+
+                <PropertyColumn Property="x => x.DomainName" Title="Domain" CellStyle="font-weight: 500;" />
+
+                <TemplateColumn Title="Organization" Sortable="false">
+                    <CellTemplate>
+                        <MudText Typo="Typo.body2">@context.Item.Organization</MudText>
+                    </CellTemplate>
+                </TemplateColumn>
+
+                <TemplateColumn Title="Renewed On" Sortable="true">
+                    <CellTemplate>
+                        <MudText Typo="Typo.body2">@FormatRenewedOn(context.Item)</MudText>
+                    </CellTemplate>
+                </TemplateColumn>
+
+                <TemplateColumn Title="Expires On" Sortable="true">
+                    <CellTemplate>
+                        @{ var expiryInfo = GetExpiryInfo(context.Item); }
+                        <div class="d-flex align-center gap-2">
+                            <MudText Typo="Typo.body2" Color="@expiryInfo.Color">@expiryInfo.Text</MudText>
+                        </div>
+                    </CellTemplate>
+                </TemplateColumn>
+
+                <TemplateColumn Title="Environment" Sortable="false" Filterable="false" CellStyle="width: 120px;">
+                    <CellTemplate>
+                        @if (context.Item.IsStaging)
+                        {
+                            <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">Staging</MudChip>
+                        }
+                        else
+                        {
+                            <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Outlined">Production</MudChip>
+                        }
+                    </CellTemplate>
+                </TemplateColumn>
+
+                <TemplateColumn CellClass="d-flex justify-end" Sortable="false" Filterable="false" CellStyle="width: 100px;">
+                    <CellTemplate>
+                        @if (context.Item.LastError != null)
+                        {
+                            <MudTooltip Text="@context.Item.LastError" Placement="Placement.Left">
+                                <MudIconButton Icon="@Icons.Material.Filled.Info" Color="Color.Error" Size="Size.Small" />
+                            </MudTooltip>
+                        }
+                        <MudTooltip Text="Delete certificate" Placement="Placement.Left">
+                            <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" Color="Color.Error" Size="Size.Small"
+                                           OnClick="() => ConfirmDelete(context.Item)" />
+                        </MudTooltip>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+
+            <PagerContent>
+                <MudDataGridPager T="CertificateEntry" />
+            </PagerContent>
+        </MudDataGrid>
+    }
+</MudPaper>

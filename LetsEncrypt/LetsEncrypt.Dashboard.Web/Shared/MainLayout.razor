@@ -6,14 +6,33 @@
 <MudPopoverProvider />
 
 <MudLayout>
-    <MudAppBar Elevation="0">
-        <MudIcon Icon="@Icons.Material.Filled.LockClock" Color="Color.Inherit" />
-        <MudText Typo="Typo.h5" Class="ml-3">LetsEncrypt Configuration Dashboard</MudText>
+    <MudAppBar Elevation="1" Dense="true">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start"
+                       OnClick="ToggleDrawer" />
+        <MudIcon Icon="@Icons.Material.Filled.Security" Class="ml-1" />
+        <MudText Typo="Typo.h6" Class="ml-2" Style="font-weight: 600; letter-spacing: -0.02em;">
+            Let's Encrypt Dashboard
+        </MudText>
         <MudSpacer />
-        <MudIconButton @onclick="ToggleDarkMode" Color="Color.Inherit" Icon="@modeIcon" />
+        <MudTooltip Text="@(_isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode")">
+            <MudIconButton OnClick="ToggleDarkMode" Color="Color.Inherit" Icon="@_modeIcon" />
+        </MudTooltip>
     </MudAppBar>
+
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2" Variant="DrawerVariant.Mini"
+               OpenMiniOnHover="true">
+        <MudNavMenu>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">
+                Certificates
+            </MudNavLink>
+            <MudNavLink Href="/logs" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">
+                Logs
+            </MudNavLink>
+        </MudNavMenu>
+    </MudDrawer>
+
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="my-2 pt-4">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-6 px-4">
             @Body
         </MudContainer>
     </MudMainContent>
@@ -21,12 +40,58 @@
 
 @code
 {
-    MudTheme _theme = new();
-    string modeIcon => _isDarkMode ? @Icons.Material.Outlined.DarkMode : @Icons.Material.Outlined.LightMode;
+    bool _drawerOpen = true;
     bool _isDarkMode = true;
 
-    void ToggleDarkMode()
+    string _modeIcon => _isDarkMode ? Icons.Material.Outlined.DarkMode : Icons.Material.Outlined.LightMode;
+
+    MudTheme _theme = new()
     {
-        _isDarkMode = !_isDarkMode;
-    }
+        PaletteLight = new PaletteLight()
+        {
+            Primary = "#2e7d32",
+            Secondary = "#00695c",
+            Tertiary = "#558b2f",
+            AppbarBackground = "#2e7d32",
+            AppbarText = "#ffffff",
+            DrawerBackground = "#fafafa",
+            DrawerText = "#424242",
+            Background = "#f5f5f5",
+            Surface = "#ffffff",
+            Success = "#2e7d32",
+            Warning = "#f57c00",
+            Error = "#c62828",
+            Info = "#1565c0",
+        },
+        PaletteDark = new PaletteDark()
+        {
+            Primary = "#66bb6a",
+            Secondary = "#4db6ac",
+            Tertiary = "#81c784",
+            AppbarBackground = "#1b5e20",
+            AppbarText = "#ffffff",
+            DrawerBackground = "#1e1e1e",
+            DrawerText = "#e0e0e0",
+            Background = "#121212",
+            Surface = "#1e1e1e",
+            Success = "#66bb6a",
+            Warning = "#ffb74d",
+            Error = "#ef5350",
+            Info = "#42a5f5",
+        },
+        Typography = new Typography()
+        {
+            Default = new DefaultTypography()
+            {
+                FontFamily = ["Inter", "Roboto", "Helvetica", "Arial", "sans-serif"]
+            }
+        },
+        LayoutProperties = new LayoutProperties()
+        {
+            DefaultBorderRadius = "8px"
+        }
+    };
+
+    void ToggleDrawer() => _drawerOpen = !_drawerOpen;
+    void ToggleDarkMode() => _isDarkMode = !_isDarkMode;
 }
